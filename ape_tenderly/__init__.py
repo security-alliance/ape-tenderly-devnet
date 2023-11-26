@@ -5,8 +5,7 @@ from .provider import TenderlyConfig, TenderlyForkProvider, TenderlyGatewayProvi
 NETWORKS = {
     "ethereum": [
         ("mainnet", TenderlyGatewayProvider),
-        ("mainnet-fork", TenderlyForkProvider),
-        ("devnet", TenderlyDevnetProvider),
+        ("mainnet-fork", TenderlyDevnetProvider),
         ("goerli", TenderlyGatewayProvider),
         ("goerli-fork", TenderlyForkProvider),
         ("sepolia", TenderlyGatewayProvider),
