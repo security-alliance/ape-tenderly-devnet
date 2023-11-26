@@ -5,8 +5,8 @@ import pytest
 import requests
 from ape.exceptions import ConfigError
 
-from ape_tenderly import NETWORKS, TenderlyGatewayProvider
-from ape_tenderly.client import TENDERLY_GATEWAY_ACCESS_KEY, TenderlyClient
+from ape_tenderly_devnet import NETWORKS, TenderlyGatewayProvider
+from ape_tenderly_devnet.client import TENDERLY_GATEWAY_ACCESS_KEY, TenderlyClient
 
 
 @pytest.fixture(scope="session")
