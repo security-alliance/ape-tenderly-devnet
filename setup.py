@@ -47,15 +47,15 @@ with open("./README.md") as readme:
 
 
 setup(
-    name="ape-tenderly",
+    name="ape-tenderly-devnet",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="""ape-tenderly: Provider Plugin for tenderly.co""",
+    description="""ape-tenderly-devnet: Provider Plugin for tenderly.co""",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ApeWorX Ltd.",
     author_email="admin@apeworx.io",
-    url="https://github.com/ApeWorX/ape-tenderly",
+    url="https://github.com/security-alliance/ape-tenderly-devnet",
     include_package_data=True,
     install_requires=[
         "eth-ape>=0.6.0,<0.7",
@@ -63,12 +63,12 @@ setup(
     ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,
-    py_modules=["ape_tenderly"],
+    py_modules=["ape_tenderly_devnet"],
     license="Apache-2.0",
     zip_safe=False,
     keywords="ethereum",
     packages=find_packages(exclude=["tests", "tests.*"]),
-    package_data={"ape_tenderly": ["py.typed"]},
+    package_data={"ape_tenderly_devnet": ["py.typed"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
