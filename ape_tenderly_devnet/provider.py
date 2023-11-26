@@ -7,7 +7,7 @@ from ape.utils import cached_property
 from web3 import HTTPProvider, Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.middleware import geth_poa_middleware
-from typing import List, Optional, cast
+from typing import List, Optional, Union, cast
 
 from ape.types import (
     AddressType,
@@ -23,6 +23,7 @@ from web3 import HTTPProvider, Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.middleware import geth_poa_middleware
 from web3.types import TxParams
+from eth_utils import is_0x_prefixed, to_hex
 
 from .client import Fork, TenderlyClient
 
@@ -288,3 +289,41 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         logger.info(f"Confirmed {receipt.txn_hash} (total fees paid = {receipt.total_fees_paid})")
         self.chain_manager.history.append(receipt)
         return receipt
+
+    def set_balance(self, account: AddressType, amount: Union[int, float, str, bytes]):
+        is_str = isinstance(amount, str)
+        _is_hex = False if not is_str else is_0x_prefixed(str(amount))
+        is_key_word = is_str and len(str(amount).split(" ")) > 1
+        if is_key_word:
+            # This allows values such as "1000 ETH".
+            amount = self.conversion_manager.convert(amount, int)
+            is_str = False
+
+        amount_hex_str = str(amount)
+
+        # Convert to hex str
+        if is_str and not _is_hex:
+            amount_hex_str = to_hex(int(amount))
+        elif isinstance(amount, int) or isinstance(amount, bytes):
+            amount_hex_str = to_hex(amount)
+
+        self._make_request("tenderly_setBalance", [account, amount_hex_str])
+
+    def add_balance(self, account: AddressType, amount: Union[int, float, str, bytes]):
+        is_str = isinstance(amount, str)
+        _is_hex = False if not is_str else is_0x_prefixed(str(amount))
+        is_key_word = is_str and len(str(amount).split(" ")) > 1
+        if is_key_word:
+            # This allows values such as "1000 ETH".
+            amount = self.conversion_manager.convert(amount, int)
+            is_str = False
+
+        amount_hex_str = str(amount)
+
+        # Convert to hex str
+        if is_str and not _is_hex:
+            amount_hex_str = to_hex(int(amount))
+        elif isinstance(amount, int) or isinstance(amount, bytes):
+            amount_hex_str = to_hex(amount)
+
+        self._make_request("tenderly_addBalance", [account, amount_hex_str])
