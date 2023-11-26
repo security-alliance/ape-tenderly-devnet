@@ -174,10 +174,12 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         raise NotImplementedError("Tenderly Devnet not added yet")
 
     def set_timestamp(self, new_timestamp: int):
-        raise NotImplementedError("Tenderly Devnet not added yet")
+        self._make_request("evm_setNextBlockTimestamp", [new_timestamp])
 
     def mine(self, num_blocks: int = 1):
-        raise NotImplementedError("Tenderly Devnet not added yet")
+        result = self._make_request("evm_increaseBlocks", [hex(num_blocks)])
+        return result
+        # TODO handle error
 
     def connect(self):
         self._web3 = Web3(HTTPProvider(self.uri))
