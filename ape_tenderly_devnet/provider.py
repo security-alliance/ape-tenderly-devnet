@@ -11,6 +11,7 @@ from typing import List, Optional, cast
 
 from ape.types import (
     AddressType,
+    SnapshotID,
 )
 
 from ape.exceptions import (
@@ -131,6 +132,10 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     """
     _host: Optional[str] = None
 
+    @property
+    def unlocked_accounts(self) -> List[AddressType]:
+        return list(self.account_manager.test_accounts._impersonated_accounts)
+
     @cached_property
     def _client(self) -> TenderlyClient:
         return TenderlyClient()
@@ -160,6 +165,19 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     @property
     def settings(self) -> TenderlyConfig:
         return cast(TenderlyConfig, super().settings)
+        
+    
+    def snapshot(self) -> SnapshotID:
+        raise NotImplementedError("Tenderly Devnet not added yet")
+
+    def revert(self, snapshot_id: SnapshotID):
+        raise NotImplementedError("Tenderly Devnet not added yet")
+
+    def set_timestamp(self, new_timestamp: int):
+        raise NotImplementedError("Tenderly Devnet not added yet")
+
+    def mine(self, num_blocks: int = 1):
+        raise NotImplementedError("Tenderly Devnet not added yet")
 
     def connect(self):
         self._web3 = Web3(HTTPProvider(self.uri))
@@ -182,9 +200,6 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     def disconnect(self):
         self._web3 = None
 
-    @property
-    def unlocked_accounts(self) -> List[AddressType]:
-        return list(self.account_manager.test_accounts._impersonated_accounts)
 
     def unlock_account(self, address: AddressType) -> bool:
         # All accounts can be unlocked
