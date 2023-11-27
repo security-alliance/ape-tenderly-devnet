@@ -38,7 +38,6 @@ class TenderlyConfig(PluginConfig):
     """Default gas fee for transactions"""
 
 
-
 class TenderlyForkProvider(Web3Provider):
     @cached_property
     def _client(self) -> TenderlyClient:
@@ -169,8 +168,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     @property
     def settings(self) -> TenderlyConfig:
         return cast(TenderlyConfig, super().settings)
-        
-    
+
     def snapshot(self) -> SnapshotID:
         raise NotImplementedError("Tenderly Devnet not added yet")
 
@@ -208,11 +206,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
         else:
             self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
-            
 
     def disconnect(self):
         self._web3 = None
-
 
     def unlock_account(self, address: AddressType) -> bool:
         # All accounts can be unlocked
@@ -240,6 +236,11 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
                 txn_dict["type"] = HexBytes(txn_dict["type"]).hex()
 
             tx_params = cast(TxParams, txn_dict)
+            print(f"tx_params before: {tx_params}")
+            if (self._default_gas is not None):
+                tx_params["maxFeePerGas"] = self._default_gas
+                tx_params["maxPriorityFeePerGas"] = 1000000000
+
             print(f"tx_params: {tx_params}")
             try:
                 txn_hash = self.web3.eth.send_transaction(tx_params)
