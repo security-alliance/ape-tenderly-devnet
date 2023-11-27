@@ -236,10 +236,14 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
                 txn_dict["type"] = HexBytes(txn_dict["type"]).hex()
 
             tx_params = cast(TxParams, txn_dict)
-            print(f"tx_params before: {tx_params}")
             if (self._default_gas is not None):
                 tx_params["maxFeePerGas"] = self._default_gas
                 tx_params["maxPriorityFeePerGas"] = 1000000000
+
+            
+            estimated_gas = self.web3.eth.estimate_gas(tx_params)
+            print(f"Estimated gas: {estimated_gas}")
+            tx_params["gas"] = estimated_gas * 1.2 # Add buffer
 
             print(f"tx_params: {tx_params}")
             try:
