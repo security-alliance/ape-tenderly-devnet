@@ -290,6 +290,16 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         self.chain_manager.history.append(receipt)
         return receipt
 
+    def get_balance(self, address: str) -> int:
+        if hasattr(address, "address"):
+            address = address.address
+
+        result = self._make_request("eth_getBalance", [address, "latest"])
+        if not result:
+            raise ValueError(f"Failed to get balance for : {address}")
+
+        return int(result, 16) if isinstance(result, str) else result
+
     def set_balance(self, account: AddressType, amount: Union[int, float, str, bytes]):
         is_str = isinstance(amount, str)
         _is_hex = False if not is_str else is_0x_prefixed(str(amount))
