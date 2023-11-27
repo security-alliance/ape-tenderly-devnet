@@ -243,7 +243,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             
             estimated_gas = self.web3.eth.estimate_gas(tx_params)
             print(f"Estimated gas: {estimated_gas}")
-            tx_params["gas"] = estimated_gas * 1.2 # Add buffer
+            tx_params["gas"] = int(estimated_gas * 1.2) # Add buffer
 
             print(f"tx_params: {tx_params}")
             try:
