@@ -240,6 +240,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
                 txn_dict["type"] = HexBytes(txn_dict["type"]).hex()
 
             tx_params = cast(TxParams, txn_dict)
+            print(f"tx_params: {tx_params}")
             try:
                 txn_hash = self.web3.eth.send_transaction(tx_params)
             except ValueError as err:
