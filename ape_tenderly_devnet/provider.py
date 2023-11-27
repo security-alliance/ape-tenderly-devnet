@@ -22,7 +22,7 @@ from ethpm_types import HexBytes
 from web3 import HTTPProvider, Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.middleware import geth_poa_middleware
-from web3.types import TxParams
+from web3.types import TxParams, Wei
 from eth_utils import is_0x_prefixed, to_hex
 
 from .client import Fork, TenderlyClient
@@ -34,6 +34,8 @@ class TenderlyConfig(PluginConfig):
     host: Optional[str] = None
     """The host address """
 
+    default_gas: Optional[int] = None
+    """Default gas fee for transactions"""
 
 
 
@@ -132,6 +134,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     Docs: https://docs.tenderly.co/devnets/intro-to-devnets
     """
     _host: Optional[str] = None
+    _default_gas: Optional[int] = None
 
     @property
     def unlocked_accounts(self) -> List[AddressType]:
@@ -185,6 +188,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     def connect(self):
         self._web3 = Web3(HTTPProvider(self.uri))
 
+        if config_default_gas := self.settings.default_gas:
+            self._default_gas = config_default_gas
+
         try:
             chain_id = self._web3.eth.chain_id
         except Exception as err:
@@ -198,7 +204,11 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         if chain_id in (ethereum_goerli, *optimism, *polygon):
             self._web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-        self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
+        if (self._default_gas is None):
+            self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
+        else:
+            self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
+            
 
     def disconnect(self):
         self._web3 = None
