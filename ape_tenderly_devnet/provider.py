@@ -198,7 +198,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             print(f"Config default gas: {config_default_gas}")
             self._default_gas = config_default_gas
 
-        if config_tx_type := self.settings.tx_type:
+        if (config_tx_type := self.settings.tx_type) is not None:
             print(f"Config tx type: {config_tx_type}")
             self._tx_type = config_tx_type
 
