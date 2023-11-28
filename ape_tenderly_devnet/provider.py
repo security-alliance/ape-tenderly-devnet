@@ -212,10 +212,10 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         if chain_id in (ethereum_goerli, *optimism, *polygon):
             self._web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-        # if (self._default_gas is None):
-        self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
-        # else:
-        #     self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
+        if (self._default_gas is None):
+            self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
+        else:
+            self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
 
     def disconnect(self):
         self._web3 = None
@@ -249,11 +249,14 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             tx_params = cast(TxParams, txn_dict)
             # print(f"Tx params: {tx_params}")
             if (self._default_gas is not None):
+                print(f"Default gas: {self._default_gas}")
                 tx_params["maxFeePerGas"] = self._default_gas
                 tx_params["maxPriorityFeePerGas"] = 1000000000
 
                 if (self._tx_type is not None):
+                    print(f"Tx type: {self._tx_type}")
                     if (self._tx_type == 0):
+                        print(f"Tx type is 0")
                         tx_params.pop("maxFeePerGas", None)
                         tx_params.pop("maxPriorityFeePerGas", None)
                         tx_params["gasPrice"] = self._default_gas
