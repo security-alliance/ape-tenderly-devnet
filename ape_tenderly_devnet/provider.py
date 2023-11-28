@@ -240,6 +240,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             if (self._default_gas is not None):
                 # tx_params["maxFeePerGas"] = self._default_gas
                 tx_params["gasPrice"] = self._default_gas
+                tx_params["type"] = 0
                 # tx_params["maxPriorityFeePerGas"] = 1000000000
 
             
