@@ -257,6 +257,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
                         tx_params.pop("maxFeePerGas", None)
                         tx_params.pop("maxPriorityFeePerGas", None)
                         tx_params["gasPrice"] = self._default_gas
+                        tx_params["type"] = "0x0"
 
             print(f"Tx params after: {tx_params}")
 
