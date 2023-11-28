@@ -227,9 +227,10 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             # Allow for an unsigned transaction
             sender = cast(AddressType, sender)  # We know it's checksummed at this point.
             txn = self.prepare_transaction(txn)
-            original_code = HexBytes(self.get_code(sender))
-            if original_code:
-                self.set_code(sender, "")
+            # not supported on tenderly
+            # original_code = HexBytes(self.get_code(sender))
+            # if original_code:
+            #     self.set_code(sender, "")
 
             txn_dict = txn.dict()
             if isinstance(txn_dict.get("type"), int):
@@ -238,6 +239,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             tx_params = cast(TxParams, txn_dict)
             if (self._default_gas is not None):
                 tx_params["maxFeePerGas"] = self._default_gas
+                tx_params["gasPrice"] = self._default_gas
                 tx_params["maxPriorityFeePerGas"] = 1000000000
 
             
@@ -245,15 +247,14 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             print(f"Estimated gas: {estimated_gas}")
             tx_params["gas"] = int(estimated_gas * 1.2) # Add buffer
 
-            print(f"tx_params: {tx_params}")
             try:
                 txn_hash = self.web3.eth.send_transaction(tx_params)
             except ValueError as err:
                 raise self.get_virtual_machine_error(err, txn=txn) from err
 
-            finally:
-                if original_code:
-                    self.set_code(sender, original_code.hex())
+            # finally:
+            #     if original_code:
+            #         self.set_code(sender, original_code.hex())
         else:
             try:
                 txn_hash = self.web3.eth.send_raw_transaction(txn.serialize_transaction())
