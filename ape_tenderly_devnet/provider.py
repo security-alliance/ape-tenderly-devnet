@@ -8,6 +8,9 @@ from web3 import HTTPProvider, Web3
 from web3.gas_strategies.rpc import rpc_gas_price_strategy
 from web3.middleware import geth_poa_middleware
 from typing import List, Optional, Union, cast
+from eth_typing import (
+    HexStr,
+)
 
 from ape.types import (
     AddressType,
@@ -36,6 +39,9 @@ class TenderlyConfig(PluginConfig):
 
     default_gas: Optional[int] = None
     """Default gas fee for transactions"""
+
+    tx_type: Optional[Union[int, HexStr]] = None
+    """Default tx type for transactions"""
 
 
 class TenderlyForkProvider(Web3Provider):
@@ -134,6 +140,7 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     """
     _host: Optional[str] = None
     _default_gas: Optional[int] = None
+    _tx_type: Optional[Union[int, HexStr]] = None
 
     @property
     def unlocked_accounts(self) -> List[AddressType]:
@@ -189,6 +196,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         if config_default_gas := self.settings.default_gas:
             self._default_gas = config_default_gas
 
+        if config_tx_type := self.settings.tx_type:
+            self._tx_type = config_tx_type
+
         try:
             chain_id = self._web3.eth.chain_id
         except Exception as err:
@@ -202,10 +212,10 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
         if chain_id in (ethereum_goerli, *optimism, *polygon):
             self._web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
-        if (self._default_gas is None):
-            self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
-        else:
-            self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
+        # if (self._default_gas is None):
+        self._web3.eth.set_gas_price_strategy(rpc_gas_price_strategy)
+        # else:
+        #     self._web3.eth.set_gas_price_strategy(lambda web3, txn: Wei(self._default_gas))
 
     def disconnect(self):
         self._web3 = None
@@ -239,18 +249,20 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             tx_params = cast(TxParams, txn_dict)
             # print(f"Tx params: {tx_params}")
             if (self._default_gas is not None):
-                # tx_params.pop("maxFeePerGas", None)
-                # tx_params.pop("maxPriorityFeePerGas", None)
                 tx_params["maxFeePerGas"] = self._default_gas
-                # tx_params["gasPrice"] = self._default_gas
-                # tx_params["type"] = 0
                 tx_params["maxPriorityFeePerGas"] = 1000000000
 
-            # print(f"Tx params after: {tx_params}")
-            
+                if (self._tx_type is not None):
+                    if (self._tx_type == 0):
+                        tx_params.pop("maxFeePerGas", None)
+                        tx_params.pop("maxPriorityFeePerGas", None)
+                        tx_params["gasPrice"] = self._default_gas
+
+            print(f"Tx params after: {tx_params}")
+
             estimated_gas = self.web3.eth.estimate_gas(tx_params)
             print(f"Estimated gas: {estimated_gas}")
-            tx_params["gas"] = int(estimated_gas * 1.2) # Add buffer
+            tx_params["gas"] = int(estimated_gas * 1.2)  # Add buffer
 
             try:
                 txn_hash = self.web3.eth.send_transaction(tx_params)
