@@ -238,8 +238,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
 
             tx_params = cast(TxParams, txn_dict)
             if (self._default_gas is not None):
-                tx_params["maxFeePerGas"] = self._default_gas
-                tx_params["maxPriorityFeePerGas"] = 1000000000
+                # tx_params["maxFeePerGas"] = self._default_gas
+                tx_params["gasPrice"] = self._default_gas
+                # tx_params["maxPriorityFeePerGas"] = 1000000000
 
             
             estimated_gas = self.web3.eth.estimate_gas(tx_params)
