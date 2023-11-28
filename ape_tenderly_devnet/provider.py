@@ -241,9 +241,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
             sender = cast(AddressType, sender)  # We know it's checksummed at this point.
             txn = self.prepare_transaction(txn)
             # not supported on tenderly
-            # original_code = HexBytes(self.get_code(sender))
-            # if original_code:
-            #     self.set_code(sender, "")
+            original_code = HexBytes(self.get_code(sender))
+            if original_code:
+                raise NotImplementedError("Tenderly Testnet does not support code replacement")
 
             txn_dict = txn.dict()
             if isinstance(txn_dict.get("type"), int):
