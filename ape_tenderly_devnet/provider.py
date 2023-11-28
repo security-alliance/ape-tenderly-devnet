@@ -193,10 +193,13 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
     def connect(self):
         self._web3 = Web3(HTTPProvider(self.uri))
 
+        print(f"Settings: {self.settings}")
         if config_default_gas := self.settings.default_gas:
+            print(f"Config default gas: {config_default_gas}")
             self._default_gas = config_default_gas
 
         if config_tx_type := self.settings.tx_type:
+            print(f"Config tx type: {config_tx_type}")
             self._tx_type = config_tx_type
 
         try:
@@ -253,8 +256,9 @@ class TenderlyDevnetProvider(Web3Provider, TestProviderAPI):
                 tx_params["maxFeePerGas"] = self._default_gas
                 tx_params["maxPriorityFeePerGas"] = 1000000000
 
+                print(f"Tx type: {self._tx_type}")
                 if (self._tx_type is not None):
-                    print(f"Tx type: {self._tx_type}")
+                    print(f"Tx type set: {self._tx_type}")
                     if (self._tx_type == 0):
                         print(f"Tx type is 0")
                         tx_params.pop("maxFeePerGas", None)
